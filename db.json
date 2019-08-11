@@ -1,0 +1,12 @@
+{
+    "certificates": [
+        {
+            "date": 29292,
+            "amount":100,
+            "bankName":"Bank Misr",
+            "duration":"3",
+            "interest-duration":"12",
+            "interest-amount":"2"
+        }
+    ]
+}
