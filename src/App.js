@@ -1,62 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { DatePicker, InputNumber, Select, Row, Col, Button } from 'antd';
 import { MDBDataTable } from 'mdbreact';
 import axios from 'axios';
-
+ 
 import './App.css';
 
-
-
-const data = {
-  columns: [
-    {
-      label: 'البنك',
-      field: 'name',
-      sort: 'asc',
-      width: 150,
-    },
-    {
-      label: 'خروج الفائدة كل',
-      field: 'position',
-      sort: 'asc',
-      width: 270,
-    },
-    {
-      label: 'عمر الشهادة',
-      field: 'office',
-      sort: 'asc',
-      width: 200,
-    },
-    {
-      label: 'قيمة الفائدة',
-      field: 'age',
-      sort: 'asc',
-      width: 100,
-    },
-    {
-      label: 'قيمتها',
-      field: 'date',
-      sort: 'asc',
-      width: 150,
-    },
-    {
-      label: 'تاريخ الشهادة',
-      field: 'salary',
-      sort: 'asc',
-      width: 100,
-    },
-  ],
-  rows: [
-    {
-      name: 'Tiger Nixon',
-      position: 'System Architect',
-      office: 'Edinburgh',
-      age: '61',
-      date: '2011/04/25',
-      salary: '$320',
-    },
-  ],
-};
 const App = () => {
   const dateFormat = 'DD/MM/YYYY';
   const { Option } = Select;
@@ -66,41 +14,95 @@ const App = () => {
   const [duration, setDuration] = useState(0);
   const [interestDuration, setInterestDuration] = useState(0);
   const [interestAmount, setInterestAmount] = useState(0);
+  const [certificatesData, setCertificatesData] = useState([]);
+  const [appearSuccessfulSubmission, setAppearSuccessful] = useState(false);
+
+  const data = {
+    columns: [
+      {
+        label: 'البنك',
+        field: 'bankName',
+        sort: 'asc',
+      },
+      {
+        label: 'خروج الفائدة كل',
+        field: 'interestDuration',
+        sort: 'asc',
+      },
+      {
+        label: 'عمر الشهادة',
+        field: 'duration',
+        sort: 'asc',
+      },
+      {
+        label: 'قيمة الفائدة',
+        field: 'interestAmount',
+        sort: 'asc',
+      },
+      {
+        label: 'قيمتها',
+        field: 'amount',
+        sort: 'asc',
+      },
+      {
+        label: 'تاريخ الشهادة',
+        field: 'date',
+        sort: 'asc',
+      },
+    ],
+    rows: [],
+  };
+
+  useEffect(() => {
+    // Update the document title using the browser API
+    axios.get('http://localhost:3001/certificates').then((res) => {
+      res.data.forEach((dataEntry) => {
+        const { id, ...rest } = dataEntry;
+        data.rows.unshift(rest);
+      });
+      setCertificatesData(data);
+    });
+  }, [appearSuccessfulSubmission]);
 
   const addNewCertificate = () => {
-    console.log(' A certificate has been added ');
+    axios
+      .post('http://localhost:3001/certificates', {
+        bankName,
+        interestDuration,
+        duration,
+        interestAmount,
+        amount,
+        date,
+      })
+      .then(() => {
+        setAppearSuccessful(true);
+      });
   };
 
   const onChangeInterestRate = (value) => {
-    console.log(value);
     setInterestAmount(value);
   };
   const onChangeAmount = (value) => {
-    console.log(value);
     setAmount(value);
   };
 
   const onChangeDate = (value) => {
-    console.log(value);
     setDate(value);
   };
 
   const onChangeDuration = (value) => {
-    console.log(value);
     setDuration(value);
   };
   const onChangeinterestDuration = (value) => {
-    console.log(value);
     setInterestDuration(value);
   };
   const onChangebankName = (value) => {
-    console.log(value);
     setBankName(value);
   };
 
   return (
     <div className="App">
-      <div style={{ border: 'solid 5px', paddingBottom: 50, margin: 60 }}>
+      <div style={{ border: 'solid 5px', paddingBottom: 40, margin: 60 }}>
         <h1 style={{ marginBottom: 40, marginTop: 30 }}>إضافة شهادة استثمار</h1>
         <Row gutter={15} type="flex" justify="center">
           <Col>
@@ -132,10 +134,10 @@ const App = () => {
                   .indexOf(input.toLowerCase()) >= 0
               }
             >
-              <Option value="month"> شهرى</Option>
-              <Option value="quarter">ربع سنوى</Option>
-              <Option value="half">نصف سنوى </Option>
-              <Option value="annualy">سنوى</Option>
+              <Option value="شهرى"> شهرى</Option>
+              <Option value="ربع سنوى">ربع سنوى</Option>
+              <Option value="نصف سنوى">نصف سنوى </Option>
+              <Option value="سنوى">سنوى</Option>
             </Select>
           </Col>
 
@@ -151,10 +153,10 @@ const App = () => {
                   .indexOf(input.toLowerCase()) >= 0
               }
             >
-              <Option value="one"> سنة</Option>
-              <Option value="oneHalf">سنة ونصف</Option>
-              <Option value="three">ثلاث سنوات</Option>
-              <Option value="five">خمس سنوات</Option>
+              <Option value="سنة"> سنة</Option>
+              <Option value="سنة ونصف">سنة ونصف</Option>
+              <Option value="ثلاث سنوات">ثلاث سنوات</Option>
+              <Option value="خمس سنوات">خمس سنوات</Option>
             </Select>
           </Col>
 
@@ -171,9 +173,9 @@ const App = () => {
                   .indexOf(input.toLowerCase()) >= 0
               }
             >
-              <Option value="Misr">بنك مصر</Option>
-              <Option value="Ahly">البنك الاهلى</Option>
-              <Option value="Kahera">بنك القاهرة</Option>
+              <Option value="بنك مصر">بنك مصر</Option>
+              <Option value="البنك الاهلى">البنك الاهلى</Option>
+              <Option value="بنك القاهرة">بنك القاهرة</Option>
             </Select>
           </Col>
 
@@ -197,6 +199,13 @@ const App = () => {
             />
           </Col>
         </Row>
+        <Row>
+          {appearSuccessfulSubmission ? (
+            <h2 style={{ marginTop: 30, fontSize: 25, color: 'green' }}>
+              تمت إضافة البيانات بنجاح
+            </h2>
+          ) : null}
+        </Row>
       </div>
       <div>
         <MDBDataTable
@@ -206,7 +215,7 @@ const App = () => {
           hover
           small
           searchLabel=""
-          data={data}
+          data={certificatesData}
           searching={true}
           entriesLabel=""
           responsive
