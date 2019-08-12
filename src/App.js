@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { DatePicker, InputNumber, Select, Row, Col, Button } from 'antd';
 import { MDBDataTable } from 'mdbreact';
+import { calculateInterests } from './calculations';
+import data from './constants/data';
 import axios from 'axios';
- 
+
 import './App.css';
 
 const App = () => {
@@ -16,51 +18,20 @@ const App = () => {
   const [interestAmount, setInterestAmount] = useState(0);
   const [certificatesData, setCertificatesData] = useState([]);
   const [appearSuccessfulSubmission, setAppearSuccessful] = useState(false);
+  const [interestsDataTable, SetInterestDataTable] = useState([]);
 
-  const data = {
-    columns: [
-      {
-        label: 'البنك',
-        field: 'bankName',
-        sort: 'asc',
-      },
-      {
-        label: 'خروج الفائدة كل',
-        field: 'interestDuration',
-        sort: 'asc',
-      },
-      {
-        label: 'عمر الشهادة',
-        field: 'duration',
-        sort: 'asc',
-      },
-      {
-        label: 'قيمة الفائدة',
-        field: 'interestAmount',
-        sort: 'asc',
-      },
-      {
-        label: 'قيمتها',
-        field: 'amount',
-        sort: 'asc',
-      },
-      {
-        label: 'تاريخ الشهادة',
-        field: 'date',
-        sort: 'asc',
-      },
-    ],
-    rows: [],
-  };
+  let interestData;
 
   useEffect(() => {
     // Update the document title using the browser API
     axios.get('http://localhost:3001/certificates').then((res) => {
       res.data.forEach((dataEntry) => {
         const { id, ...rest } = dataEntry;
-        data.rows.unshift(rest);
+        data.certificatesTableData.rows.unshift(rest);
+        interestData = calculateInterests(rest);
       });
-      setCertificatesData(data);
+      setCertificatesData(data.certificatesTableData);
+      loadInterestsDate();
     });
   }, [appearSuccessfulSubmission]);
 
@@ -77,6 +48,25 @@ const App = () => {
       .then(() => {
         setAppearSuccessful(true);
       });
+  };
+
+  const loadInterestsDate = () => {
+    let {
+      sortedDateArray,
+      interestDictionary,
+      bankNameDictionary,
+      interestAmountDictionary,
+      amountDictionary,
+    } = interestData;
+
+    for (let element of sortedDateArray) {
+      data.interestTableData.rows.push({
+        interest: interestDictionary[element],
+        date: element,
+      });
+    }
+
+    SetInterestDataTable(data.interestTableData);
   };
 
   const onChangeInterestRate = (value) => {
@@ -207,7 +197,7 @@ const App = () => {
           ) : null}
         </Row>
       </div>
-      <div>
+      <div style={{ marginLeft: 120, marginRight: 120 }}>
         <MDBDataTable
           btn
           className="text-center"
@@ -216,6 +206,21 @@ const App = () => {
           small
           searchLabel=""
           data={certificatesData}
+          searching={true}
+          entriesLabel=""
+          responsive
+        />
+      </div>
+
+      <div style={{ marginLeft: 120, marginRight: 120 }}>
+        <MDBDataTable
+          btn
+          className="text-center"
+          theadColor="text-muted"
+          hover
+          small
+          searchLabel=""
+          data={interestsDataTable}
           searching={true}
           entriesLabel=""
           responsive
