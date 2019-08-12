@@ -3,19 +3,19 @@
     {
       "bankName": "البنك الاهلى",
       "interestDuration": "ربع سنوى",
-      "duration": "ثلاث سنوات",
-      "interestAmount": 20,
-      "amount": 55000,
-      "date": "2019-06-10T19:22:08.289Z",
+      "duration": "سنة ونصف",
+      "interestAmount": 12,
+      "amount": 12333,
+      "date": "2019-08-06T11:41:48.710Z",
       "id": 1
     },
     {
-      "bankName": "بنك مصر",
-      "interestDuration": "ربع سنوى",
-      "duration": "سنة ونصف",
+      "bankName": "البنك الاهلى",
+      "interestDuration": "نصف سنوى",
+      "duration": "ثلاث سنوات",
       "interestAmount": 12,
-      "amount": 12000,
-      "date": "2019-08-04T21:55:48.317Z",
+      "amount": 92033,
+      "date": "2016-05-11T11:41:48.710Z",
       "id": 2
     }
   ]

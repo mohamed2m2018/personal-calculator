@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { DatePicker, InputNumber, Select, Row, Col, Button } from 'antd';
 import { MDBDataTable } from 'mdbreact';
-import { calculateInterests } from './calculations';
+import calculateInterests from './calculations/interestCalculations';
+import CalculateZakah from './calculations/zakahCalculations';
 import data from './constants/data';
 import axios from 'axios';
 
@@ -19,21 +20,30 @@ const App = () => {
   const [certificatesData, setCertificatesData] = useState([]);
   const [appearSuccessfulSubmission, setAppearSuccessful] = useState(false);
   const [interestsDataTable, SetInterestDataTable] = useState([]);
+  const [zakahDataTable, setZakahDataTable] = useState([]);
+  const [toggle,setToggle]=useState(false);
 
   let interestData;
+  let zakahData;
 
   useEffect(() => {
     // Update the document title using the browser API
     axios.get('http://localhost:3001/certificates').then((res) => {
+      data.certificatesTableData.rows=[];
       res.data.forEach((dataEntry) => {
         const { id, ...rest } = dataEntry;
         data.certificatesTableData.rows.unshift(rest);
         interestData = calculateInterests(rest);
+        zakahData = CalculateZakah(rest);
       });
-      setCertificatesData(data.certificatesTableData);
-      loadInterestsDate();
+      //to get rid of react hooks bailing out when comparing state with isObject
+      setCertificatesData({...data.certificatesTableData});
+      if (data.certificatesTableData.rows.length !== 0) {
+        loadInterestsDate();
+        loadZakahTable();
+      }
     });
-  }, [appearSuccessfulSubmission]);
+  }, [toggle]);
 
   const addNewCertificate = () => {
     axios
@@ -47,17 +57,12 @@ const App = () => {
       })
       .then(() => {
         setAppearSuccessful(true);
+        setToggle(!toggle);
       });
   };
 
   const loadInterestsDate = () => {
-    let {
-      sortedDateArray,
-      interestDictionary,
-      bankNameDictionary,
-      interestAmountDictionary,
-      amountDictionary,
-    } = interestData;
+    let { sortedDateArray, interestDictionary } = interestData;
 
     for (let element of sortedDateArray) {
       data.interestTableData.rows.push({
@@ -66,7 +71,23 @@ const App = () => {
       });
     }
 
-    SetInterestDataTable(data.interestTableData);
+    SetInterestDataTable({ ...data.interestTableData });
+  };
+
+  const loadZakahTable = () => {
+    let { sortedDateArray, zakahDictionary } = zakahData;
+
+    console.log(sortedDateArray);
+    console.log(zakahDictionary);
+
+    for (let element of sortedDateArray) {
+      data.zakahTableData.rows.push({
+        zakah: zakahDictionary[element],
+        date: element,
+      });
+    }
+
+    setZakahDataTable({ ...data.zakahTableData });
   };
 
   const onChangeInterestRate = (value) => {
@@ -197,6 +218,10 @@ const App = () => {
           ) : null}
         </Row>
       </div>
+      <Button>إظهار كل الزكاة</Button>
+      <Button>إظهار كل الفوائد</Button>
+      <Button>إظهار كل الشهادات</Button>
+
       <div style={{ marginLeft: 120, marginRight: 120 }}>
         <MDBDataTable
           btn
@@ -221,6 +246,21 @@ const App = () => {
           small
           searchLabel=""
           data={interestsDataTable}
+          searching={true}
+          entriesLabel=""
+          responsive
+        />
+      </div>
+
+      <div style={{ marginLeft: 120, marginRight: 120 }}>
+        <MDBDataTable
+          btn
+          className="text-center"
+          theadColor="text-muted"
+          hover
+          small
+          searchLabel=""
+          data={zakahDataTable}
           searching={true}
           entriesLabel=""
           responsive

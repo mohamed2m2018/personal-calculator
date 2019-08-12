@@ -49,6 +49,21 @@ let data = {
     ],
     rows: [],
   },
+  zakahTableData:{
+    columns: [
+        {
+          label: 'قيمة الزكاة',
+          field: 'zakah',
+          sort: 'asc',
+        },
+        {
+          label: 'تاريخ الزكاة',
+          field: 'date',
+          sort: 'asc',
+        },
+      ],
+      rows:[]
+  }
 };
 
 export default data;
